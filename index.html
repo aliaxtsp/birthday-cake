@@ -2,52 +2,203 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Birthday Cake 🎂</title>
+<title>3D Birthday Cake 🎂</title>
 <style>
-body { background-color: black; color: white; font-family: 'Courier', monospace; text-align: center; }
-.controls { margin-bottom: 20px; }
-input, button { font-size: 16px; margin: 5px; padding: 5px 10px; }
-.cake { position: relative; width: 250px; height: 200px; margin: 0 auto; }
-.layer { position: absolute; width: 250px; height: 100px; border-radius: 50%; background-color: #553c13; }
-.layer-bottom { top: 66px; } .layer-middle { top: 33px; } .layer-top { top: 0; }
-.icing { position: absolute; top: 2px; left: 5px; width: 240px; height: 90px; border-radius: 50%; background-color: #f0e4d0; }
-.drip { position: absolute; background-color: #f0e4d0; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
+body {
+  background-color: #111;
+  color: white;
+  font-family: 'Courier', monospace;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+}
+
+.controls {
+  margin-bottom: 20px;
+}
+
+input, button {
+  font-size: 16px;
+  margin: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.cake {
+  position: relative;
+  width: 250px;
+  height: 200px;
+  margin: 0 auto;
+  perspective: 500px;
+}
+
+.layer {
+  position: absolute;
+  width: 250px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #7b4f2f, #553c13);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+}
+
+.layer-bottom { top: 66px; }
+.layer-middle { top: 33px; transform: rotateX(10deg); }
+.layer-top { top: 0; transform: rotateX(15deg); }
+
+.icing {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 240px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #fff, #f0e4d0);
+}
+
+.drip {
+  position: absolute;
+  background-color: #f0e4d0;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
 .drip1 { top: 53px; left: 5px; width: 40px; height: 48px; transform: skewY(15deg);}
 .drip2 { top: 69px; left: 181px; width: 40px; height: 48px; transform: skewY(-15deg);}
 .drip3 { top: 54px; left: 90px; width: 80px; height: 60px; border-radius: 40px;}
-.candle { position: absolute; width: 16px; height: 50px; border-radius: 8px / 4px; background-color: #0000ff; }
-.candle .flame { position: absolute; top: -12px; left: 0; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle, orange 30%, yellow 70%); animation: flicker 0.3s infinite alternate; }
-@keyframes flicker { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+
+.candle {
+  position: absolute;
+  width: 16px;
+  height: 50px;
+  border-radius: 8px / 4px;
+  background-color: #0000ff;
+  top: -20px;
+}
+
+.candle .flame {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, orange 30%, yellow 70%);
+  animation: flicker 0.3s infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.2); }
+}
+
+.candle.extinguished .flame { display: none; }
 </style>
 </head>
 <body>
-<h1>Birthday Cake 🎂</h1>
+<h1>3D Birthday Cake 🎂</h1>
+
 <div class="controls">
-<label for="candleNumber">Number of candles:</label>
-<input type="number" id="candleNumber" value="28" min="1" max="100">
-<button id="setCandles">Set Candles</button>
-<button id="shareCake">Share Cake</button>
+  <label for="candleNumber">Number of candles:</label>
+  <input type="number" id="candleNumber" value="5" min="1" max="50">
+  <button id="setCandles">Set Candles</button>
+  <button id="shareCake">Share Cake</button>
+  <button id="startMic">Enable Microphone</button>
 </div>
+
 <div class="cake" id="cake">
-<div class="layer layer-bottom"></div>
-<div class="layer layer-middle"></div>
-<div class="layer layer-top"></div>
-<div class="icing"></div>
-<div class="drip drip1"></div>
-<div class="drip drip2"></div>
-<div class="drip drip3"></div>
+  <div class="layer layer-bottom"></div>
+  <div class="layer layer-middle"></div>
+  <div class="layer layer-top"></div>
+  <div class="icing"></div>
+  <div class="drip drip1"></div>
+  <div class="drip drip2"></div>
+  <div class="drip drip3"></div>
 </div>
+
 <script>
 const cake = document.getElementById('cake');
 let candles = [];
-function addCandle(left) { const candle = document.createElement('div'); candle.className = 'candle'; candle.style.left = left + 'px'; const flame = document.createElement('div'); flame.className = 'flame'; candle.appendChild(flame); cake.appendChild(candle); candles.push(candle); }
-function clearCandles() { candles.forEach(c => c.remove()); candles = []; }
-function setCandles(n) { clearCandles(); const cakeWidth = 250; for (let i = 0; i < n; i++) { const left = (cakeWidth / (n+1)) * (i+1) - 8; addCandle(left); } }
-document.getElementById('setCandles').onclick = () => { const n = parseInt(document.getElementById('candleNumber').value); setCandles(n); }
-document.getElementById('shareCake').onclick = () => { const n = parseInt(document.getElementById('candleNumber').value); const url = new URL(window.location.href); url.searchParams.set('candles', n); navigator.clipboard.writeText(url.toString()).then(() => alert('Cake link copied!')); }
+
+// Add candle at a specific position
+function addCandle(left) {
+  const candle = document.createElement('div');
+  candle.className = 'candle';
+  candle.style.left = left + 'px';
+  const flame = document.createElement('div');
+  flame.className = 'flame';
+  candle.appendChild(flame);
+  cake.appendChild(candle);
+  candles.push(candle);
+}
+
+// Remove all candles
+function clearCandles() {
+  candles.forEach(c => c.remove());
+  candles = [];
+}
+
+// Set candles evenly
+function setCandles(n) {
+  clearCandles();
+  const cakeWidth = 250;
+  for (let i = 0; i < n; i++) {
+    const left = (cakeWidth / (n+1)) * (i+1) - 8;
+    addCandle(left);
+  }
+}
+
+// Candle input button
+document.getElementById('setCandles').onclick = () => {
+  const n = parseInt(document.getElementById('candleNumber').value);
+  setCandles(n);
+}
+
+// Share button
+document.getElementById('shareCake').onclick = () => {
+  const n = parseInt(document.getElementById('candleNumber').value);
+  const url = new URL(window.location.href);
+  url.searchParams.set('candles', n);
+  navigator.clipboard.writeText(url.toString())
+    .then(() => alert('Cake link copied!'));
+}
+
+// Load candles from URL if shared
 const params = new URLSearchParams(window.location.search);
 const candleCountFromURL = parseInt(params.get('candles'));
-if(candleCountFromURL) { document.getElementById('candleNumber').value = candleCountFromURL; setCandles(candleCountFromURL); } else { setCandles(28); }
+if(candleCountFromURL) {
+  document.getElementById('candleNumber').value = candleCountFromURL;
+  setCandles(candleCountFromURL);
+} else {
+  setCandles(5);
+}
+
+// Microphone to blow out candles
+document.getElementById('startMic').onclick = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    source.connect(analyser);
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    function checkVolume() {
+      analyser.getByteFrequencyData(dataArray);
+      let sum = dataArray.reduce((a,b) => a+b,0);
+      let avg = sum / dataArray.length;
+      if(avg > 50) { // threshold for blowing
+        candles.forEach(c => c.classList.add('extinguished'));
+      }
+      requestAnimationFrame(checkVolume);
+    }
+    checkVolume();
+    alert("Blow on your mic to extinguish the candles!");
+  } catch(err) {
+    alert("Microphone not enabled: " + err);
+  }
+}
 </script>
 </body>
 </html>
+
